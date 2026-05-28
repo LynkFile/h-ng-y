@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>HUYỀN_Đáng_Yêu</title>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@800&family=VT323&display=swap');
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,body{
+width:100%;
+height:100%;
+overflow:hidden;
+background:#000;
+font-family:'VT323',monospace;
+color:#00ff88;
+}
+
+body{
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* CRT */
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+pointer-events:none;
+background:repeating-linear-gradient(
+to bottom,
+rgba(255,255,255,.03),
+rgba(255,255,255,.03) 1px,
+transparent 1px,
+transparent 3px
+);
+animation:flicker .1s infinite;
+z-index:99999;
+}
+
+@keyframes flicker{
+
+0%{opacity:1}
+50%{opacity:.96}
+100%{opacity:1}
+
+}
+
+/* BACKGROUND */
+
+canvas{
+position:fixed;
+inset:0;
+z-index:-10;
+
+background:
+radial-gradient(
+circle at center,
+#2b0033 0%,
+#120018 40%,
+#050008 100%
+);
+
+}
+
+/* BOX */
+
+.box{
+
+width:90%;
+max-width:850px;
+
+background:rgba(0,0,0,.8);
+
+border:3px solid #00ff88;
+
+padding:25px;
+
+box-shadow:0 0 25px #00ff88;
+
+text-align:center;
+
+}
+
+/* TITLE */
+
+.title{
+
+position:relative;
+
+overflow:hidden;
+
+font-size:52px;
+
+font-family:'Orbitron',sans-serif;
+
+font-weight:800;
+
+letter-spacing:5px;
+
+text-transform:uppercase;
+
+margin-bottom:22px;
+
+line-height:1.2;
+
+word-break:break-word;
+
+color:#ffd6f2;
+
+text-shadow:
+0 0 10px #ff4da6,
+0 0 20px #ff4da6,
+0 0 40px #ff4da6;
+
+animation:
+float 3s infinite ease-in-out,
+glow 1.5s infinite alternate;
+
+}
+
+@keyframes float{
+
+0%{transform:translateY(0)}
+50%{transform:translateY(-8px)}
+100%{transform:translateY(0)}
+
+}
+
+@keyframes glow{
+
+0%{
+text-shadow:
+0 0 10px #ff4da6,
+0 0 20px #ff4da6;
+}
+
+100%{
+text-shadow:
+0 0 20px #ff99d6,
+0 0 40px #ff4da6,
+0 0 70px #ff4da6;
+}
+
+}
+
+/* TERMINAL */
+
+#terminal{
+
+height:220px;
+
+overflow:auto;
+
+border:2px solid #00ff88;
+
+padding:15px;
+
+font-size:24px;
+
+text-align:left;
+
+background:black;
+
+margin-bottom:20px;
+
+}
+
+/* BUTTON */
+
+button{
+
+padding:15px 35px;
+
+font-size:28px;
+
+border:none;
+
+border-radius:15px;
+
+cursor:pointer;
+
+margin:10px;
+
+font-family:inherit;
+
+transition:.2s;
+
+background:#ff4da6;
+
+color:white;
+
+box-shadow:0 0 20px #ff4da6;
+
+}
+
+button:hover{
+
+transform:scale(1.08);
+
+}
+
+/* POPUP */
+
+.popup{
+
+position:fixed;
+
+background:black;
+
+color:red;
+
+border:2px solid red;
+
+padding:10px;
+
+font-size:22px;
+
+z-index:999999;
+
+animation:pop .15s infinite alternate;
+
+}
+
+@keyframes pop{
+
+0%{transform:scale(1)}
+100%{transform:scale(1.08)}
+
+}
+
+/* IMAGE */
+
+#displayImage{
+
+display:none;
+
+position:fixed;
+
+top:0;
+left:0;
+
+width:100vw;
+height:100vh;
+
+object-fit:cover;
+
+background:black;
+
+z-index:999999999;
+
+opacity:0;
+
+transition:opacity 1s;
+
+}
+
+#displayImage.show{
+
+opacity:1;
+
+}
+
+/* SHAKE */
+
+@keyframes shake{
+
+0%{transform:translate(2px,1px);}
+25%{transform:translate(-2px,-1px);}
+50%{transform:translate(2px,-2px);}
+75%{transform:translate(-1px,2px);}
+100%{transform:translate(1px,-1px);}
+
+}
+
+/* PULSE */
+
+@keyframes pulse{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.08);}
+100%{transform:scale(1);}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="heartField"></canvas>
+
+<div class="box">
+
+<div class="title">
+HUYỀN_Đáng_Yêu
+</div>
+
+<div id="terminal"></div>
+
+<div id="screen"></div>
+
+</div>
+
+<img id="displayImage"
+src="cover.png">
+
+<script>
+
+/* TERMINAL */
+
+const terminal =
+document.getElementById("terminal");
+
+const logs = [
+
+"> loading trái tim Huyền❤️...",
+"> scanning simp level...",
+"> phát hiện người dùng 😳...",
+"> đọc ký ức...",
+"> reality corruption rising...",
+"> GPU chuẩn bị cháy 🔥...",
+"> Huyền đang online 👁..."
+
+];
+
+setInterval(()=>{
+
+const d =
+document.createElement("div");
+
+d.innerHTML =
+logs[Math.floor(
+Math.random()*logs.length
+)];
+
+terminal.appendChild(d);
+
+terminal.scrollTop =
+terminal.scrollHeight;
+
+},700);
+
+/* CANVAS */
+
+const canvas =
+document.getElementById("heartField");
+
+const ctx =
+canvas.getContext("2d");
+
+function resize(){
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+}
+
+resize();
+
+addEventListener("resize",resize);
+
+const hearts = [];
+
+for(let i=0;i<220;i++){
+
+hearts.push({
+
+x:(Math.random()-0.5)*2000,
+y:(Math.random()-0.5)*2000,
+z:Math.random()*2000,
+size:Math.random()*20+8,
+speed:Math.random()*8+4,
+color:`hsl(${330+Math.random()*20},100%,70%)`
+
+});
+
+}
+
+function drawHeart(x,y,size,color,blur){
+
+ctx.save();
+
+ctx.translate(x,y);
+
+ctx.scale(size,size);
+
+ctx.fillStyle = color;
+
+ctx.shadowColor = color;
+
+ctx.shadowBlur = blur;
+
+ctx.beginPath();
+
+ctx.moveTo(0,-0.3);
+
+ctx.bezierCurveTo(
+0.5,-1,
+1.4,-0.2,
+0,1
+);
+
+ctx.bezierCurveTo(
+-1.4,-0.2,
+-0.5,-1,
+0,-0.3
+);
+
+ctx.fill();
+
+ctx.restore();
+
+}
+
+function animate(){
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+for(const h of hearts){
+
+h.z -= h.speed;
+
+if(h.z < 1){
+
+h.z = 2000;
+
+h.x = (Math.random()-0.5)*2000;
+h.y = (Math.random()-0.5)*2000;
+
+}
+
+const scale = 600 / h.z;
+
+const x =
+h.x * scale +
+canvas.width/2;
+
+const y =
+h.y * scale +
+canvas.height/2;
+
+ctx.globalAlpha =
+1 - h.z/2000;
+
+drawHeart(
+x,
+y,
+h.size*scale,
+h.color,
+30
+);
+
+}
+
+requestAnimationFrame(
+animate
+);
+
+}
+
+animate();
+
+/* SCREEN */
+
+const screen =
+document.getElementById("screen");
+
+/* =====================
+   HÀNG CHỜ 1 PHÚT
+===================== */
+
+function renderStartWaiting(){
+
+let percent = 0;
+
+screen.innerHTML = `
+
+<h1>
+🕒 Đang tìm hàng để đứng
+</h1>
+
+<p style="
+font-size:28px;
+margin-top:25px;
+line-height:1.8;
+">
+
+⚠ Đang tìm chỗ đứng trong trái tim Huyền 😳
+
+<br><br>
+
+Đang tải:
+<span id="loadingPercent">0%</span>
+
+</p>
+
+<div style="
+width:100%;
+height:28px;
+border:2px solid #00ff88;
+margin-top:25px;
+background:black;
+overflow:hidden;
+box-shadow:0 0 20px #00ff88;
+">
+
+<div id="bar"
+style="
+width:0%;
+height:100%;
+background:linear-gradient(
+90deg,
+#ff4da6,
+#00ff88
+);
+box-shadow:0 0 20px #00ff88;
+transition:.6s;
+">
+</div>
+
+</div>
+
+`;
+
+const percentText =
+document.getElementById("loadingPercent");
+
+const bar =
+document.getElementById("bar");
+
+/* 60 GIÂY = 60000ms
+   100% => mỗi 600ms tăng 1%
+*/
+
+const loading = setInterval(()=>{
+
+percent++;
+
+percentText.innerText =
+percent + "%";
+
+bar.style.width =
+percent + "%";
+
+/* POPUP RANDOM */
+
+if(percent % 10 === 0){
+
+spawnPopup(
+"Đang quét Chiều Dài..."
+);
+
+}
+
+if(percent % 15 === 0){
+
+spawnPopup(
+"Đang quét Chiều Rộng..."
+);
+
+}
+
+if(percent % 25 === 0){
+
+spawnPopup(
+"Đang Tìm Vị Trí..."
+);
+
+}
+
+if(percent >= 100){
+
+clearInterval(loading);
+
+spawnPopup(
+"✅ Đã Có chỗ đứng trong tim Huyền"
+);
+
+setTimeout(()=>{
+
+renderStage1();
+
+},1200);
+
+}
+
+},1500);
+
+}
+
+/* =====================
+   STAGE 1
+===================== */
+
+function renderStage1(){
+
+screen.innerHTML = `
+
+<h1>
+📂 FILE ĐÃ Tìm Thấy . Trả lời Câu hỏi Của Huyền để lấy File
+</h1>
+
+<p style="
+font-size:25px;
+margin-top:20px;
+line-height:1.7;
+">
+
+⚠ Huyền Phát Hiện Anh muốn lấy file 😳
+
+<br><br>
+
+Anh có muốn tiếp tục không?
+
+</p>
+
+<button id="next">
+Triển 👍
+</button>
+
+`;
+
+document.getElementById("next")
+.onclick = ()=>{
+
+spawnPopup(
+"Đang kiểm tra ĐỘ ấm... dâu"
+);
+
+spawnPopup(
+"Đang đọc ký ức..."
+);
+
+spawnPopup(
+"À.....húuuuuuu"
+);
+
+setTimeout(()=>{
+
+renderQuestion1();
+
+},1800);
+
+};
+
+}
+
+/* =====================
+   QUESTION 1
+===================== */
+
+function renderQuestion1(){
+
+screen.innerHTML = `
+
+<h1>
+🕷️ Kiểm Tra Độ Quan Tâm
+</h1>
+
+<p style="
+font-size:25px;
+margin-top:20px;
+line-height:1.8;
+">
+
+Điền code của Huyền 😳
+
+<br><br>
+
+_ _ _
+
+</p>
+
+<input
+id="codeInput"
+maxlength="3"
+placeholder="Nhập code..."
+style="
+width:260px;
+padding:15px;
+font-size:30px;
+text-align:center;
+background:black;
+border:3px solid #00ff88;
+color:#00ff88;
+font-family:inherit;
+outline:none;
+box-shadow:0 0 20px #00ff88;
+">
+
+<br><br>
+
+<button id="check">
+XÁC NHẬN 👁
+</button>
+
+`;
+
+const input =
+document.getElementById("codeInput");
+
+const check =
+document.getElementById("check");
+
+check.onclick = ()=>{
+
+if(input.value.trim()==="884"){
+
+spawnPopup(
+"✅ Chính xác 😳"
+);
+
+setTimeout(()=>{
+
+renderQuestion2();
+
+},1500);
+
+}else{
+
+document.querySelector(".box")
+.style.animation =
+"shake .15s infinite";
+
+spawnPopup(
+"💀 Sai code"
+);
+
+setTimeout(()=>{
+
+document.querySelector(".box")
+.style.animation = "";
+
+},700);
+
+}
+
+};
+
+}
+
+/* =====================
+   CÂU 2
+===================== */
+
+function renderQuestion2(){
+
+let clickedAnswers = 0;
+
+screen.innerHTML = `
+
+<h1>
+📸 CÂU 2
+</h1>
+
+<p style="
+font-size:25px;
+margin-top:20px;
+line-height:1.8;
+">
+
+Huyền đáng yêu nhất khi nào? 😳
+
+</p>
+
+<div id="answers">
+
+<button class="q2">
+Khi cười 😘
+</button>
+
+<button class="q2">
+Khi chạy 😁
+</button>
+
+<button class="q2">
+Khi nói ❤️
+</button>
+
+</div>
+
+`;
+
+document.querySelectorAll(".q2")
+.forEach(btn=>{
+
+btn.onclick = ()=>{
+
+if(btn.classList.contains("done"))
+return;
+
+btn.classList.add("done");
+
+btn.style.background =
+"red";
+
+btn.style.boxShadow =
+"0 0 35px red";
+
+btn.style.transform =
+"rotate(5deg) scale(1.1)";
+
+spawnPopup(
+"💀 Sai rồi"
+);
+
+clickedAnswers++;
+
+if(clickedAnswers===1){
+
+spawnPopup(
+"Huyền không đồng ý 👁"
+);
+
+}
+
+if(clickedAnswers===2){
+
+spawnPopup(
+"Vẫn chưa đúng 😳"
+);
+
+}
+
+if(clickedAnswers===3){
+
+spawnPopup(
+"Chọn mãi không đúng chán"
+);
+
+document.getElementById("answers")
+.innerHTML += `
+
+<br><br>
+
+<button id="secretAnswer"
+style="
+background:#ff4da6;
+box-shadow:0 0 35px #ff4da6;
+animation:pulse .7s infinite;
+">
+CẢ 3 ĐÁP ÁN TRÊN 😳
+</button>
+
+`;
+
+document.getElementById("secretAnswer")
+.onclick = ()=>{
+
+const secret =
+document.getElementById("secretAnswer");
+
+secret.style.background =
+"#00ff88";
+
+secret.style.boxShadow =
+"0 0 40px #00ff88";
+
+secret.style.transform =
+"scale(1.2)";
+
+spawnPopup(
+"✅ Chính xác 😳"
+);
+
+spawnPopup(
+"Yêuu thế nhề ❤️"
+);
+
+setTimeout(()=>{
+
+renderQuestion3();
+
+},2000);
+
+};
+
+}
+
+};
+
+});
+
+}
+
+/* =====================
+   CÂU 3
+===================== */
+
+function renderQuestion3(){
+
+screen.innerHTML = `
+
+<h1>
+👁 CÂU HỎI CUỐI
+</h1>
+
+<p style="
+font-size:25px;
+margin-top:20px;
+line-height:1.8;
+">
+
+Hôm nay Huyền có đi làm không? 😳
+
+</p>
+
+<div id="answers">
+
+<button class="right">
+Có 😳
+</button>
+
+<button class="wrong">
+Không 💀
+</button>
+
+</div>
+
+`;
+
+document.querySelectorAll("button")
+.forEach(btn=>{
+
+btn.onclick = ()=>{
+
+if(btn.classList.contains("right")){
+
+btn.style.background =
+"#00ff88";
+
+btn.style.boxShadow =
+"0 0 35px #00ff88";
+
+spawnPopup(
+"✅ Tìm File Thành Công"
+);
+
+spawnPopup(
+"Huyền Yêu anh 😳"
+);
+
+setTimeout(()=>{
+
+renderStage3();
+
+},2000);
+
+}else{
+
+btn.style.background =
+"red";
+
+btn.style.boxShadow =
+"0 0 35px red";
+
+btn.style.transform =
+"rotate(-5deg) scale(1.1)";
+
+spawnPopup(
+"💀 Sai rồi"
+);
+
+spawnPopup(
+"Não Anh đang bị huyền Điều Khiển"
+);
+
+}
+
+};
+
+});
+
+}
+
+/* =====================
+   MÀN 4
+===================== */
+
+function renderStage3(){
+
+screen.innerHTML = `
+
+<h1>
+📸 KIỂM TRA CUỐI
+</h1>
+
+<p style="
+font-size:25px;
+margin-top:20px;
+line-height:1.7;
+">
+
+⚠ Muốn lấy file phải ngắm Huyền 😳
+
+</p>
+
+<button id="view">
+NGẮM 😳
+</button>
+
+`;
+
+document.getElementById("view")
+.onclick = ()=>{
+
+spawnPopup(
+"Đang render visual..."
+);
+
+spawnPopup(
+"Hồi....Hộpppp🔥"
+);
+
+spawnPopup(
+"Huyền đang xuất hiện 👁"
+);
+
+setTimeout(()=>{
+
+document.querySelector(".box")
+.style.display="none";
+
+const img =
+document.getElementById("displayImage");
+
+img.style.display="block";
+
+setTimeout(()=>{
+
+img.classList.add("show");
+
+},50);
+
+document.documentElement
+.requestFullscreen?.();
+
+},1500);
+
+setTimeout(()=>{
+
+renderStage4();
+
+},6000);
+
+};
+
+}
+
+/* =====================
+   MÀN 5
+===================== */
+
+function renderStage4(){
+
+document.querySelector(".box")
+.style.display="block";
+
+const img =
+document.getElementById("displayImage");
+
+img.style.display="none";
+
+img.classList.remove("show");
+
+screen.innerHTML = `
+
+<h1>
+🎉 TRUY CẬP THÀNH CÔNG
+</h1>
+
+<p style="
+font-size:25px;
+margin-top:20px;
+line-height:1.7;
+">
+
+Bạn đã vượt qua toàn bộ kiểm tra 😳
+
+<br><br>
+
+⚠ File sẽ tự động tải sau vài giây...
+
+</p>
+
+`;
+
+spawnPopup(
+"Đang kết nối Google Drive..."
+);
+
+spawnPopup(
+"Đang giải mã file..."
+);
+
+spawnPopup(
+"Huyền approved 😳"
+);
+
+/* AUTO DOWNLOAD */
+
+setTimeout(()=>{
+
+window.location.href =
+"https://docs.google.com/spreadsheets/d/1D-5N1Q_Odjyz2l0Q4roLkliKP-LZIQGq/export?format=xlsx";
+
+},5000);
+
+}
+
+/* POPUP */
+
+function spawnPopup(text){
+
+const p =
+document.createElement("div");
+
+p.className = "popup";
+
+p.innerHTML = text;
+
+p.style.left =
+Math.random()*80+"vw";
+
+p.style.top =
+Math.random()*80+"vh";
+
+document.body.appendChild(p);
+
+setTimeout(()=>{
+
+p.remove();
+
+},2500);
+
+}
+
+/* START */
+
+renderStartWaiting();
+
+</script>
+
+</body>
+</html>
